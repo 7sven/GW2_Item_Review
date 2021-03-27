@@ -27,11 +27,22 @@ around 30.000 calls. This was reduced to around 150 calls.
 
 def get_prices(ids_to_check):
     items_with_prices = []
-    i = 0
-    while i < len(ids_to_check):
-        id = ",".join([str(elem) for elem in ids_to_check[i:i + 200]])
+    iterator_all_ids = 0
+    while iterator_all_ids < len(ids_to_check):
+        id = ",".join([str(elem) for elem in ids_to_check[iterator_all_ids:iterator_all_ids + 200]])
         response_prices = urllib.request.urlopen(url_item_ids + "?ids=" + id)
-        item = json.loads(response_prices.read())
-        items_with_prices += item
-        i += 200
+        all_200_items = json.loads(response_prices.read())
+        item_reduced = []
+        for i in all_200_items:
+            item_reduced.append([i['id'], i['buys']['unit_price'], i['sells']['unit_price']])
+        items_with_prices += item_reduced
+        iterator_all_ids += 200
     return items_with_prices
+
+
+getid = get_all_ids()
+
+prices = get_prices(getid)
+
+for p in prices:
+    print(p)
