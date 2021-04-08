@@ -1,6 +1,7 @@
 import urllib.request, json
 
 url_item_ids = 'https://api.guildwars2.com//v2/commerce/prices'
+url_item_name = 'https://api.guildwars2.com/v2/items?ids='
 
 """
 function to get all the item ids from the items available on the trading post
@@ -31,10 +32,20 @@ def get_prices(ids_to_check):
     while iterator_all_ids < len(ids_to_check):
         id = ",".join([str(elem) for elem in ids_to_check[iterator_all_ids:iterator_all_ids + 200]])
         response_prices = urllib.request.urlopen(url_item_ids + "?ids=" + id)
+        response_item_info = urllib.request.urlopen(url_item_name + id)
         all_200_items = json.loads(response_prices.read())
+        all_200_names = json.loads(response_item_info.read())
         item_reduced = []
-        for i in all_200_items:
-            item_reduced.append([i['id'], i['buys']['unit_price'], i['sells']['unit_price']])
+        for i in range(len(all_200_names)):
+            if (all_200_names[i]['id'] == all_200_items[i]['id']):
+                profit = int((all_200_items[i]['sells']['unit_price'] - (all_200_items[i]['sells']['unit_price'] * 0.15)) - all_200_items[i]['buys']['unit_price'])
+                if all_200_items[i]['buys']['unit_price'] != 0 :
+                    roi = ((profit / all_200_items[i]['buys']['unit_price']) * 10000)//100
+                else:
+                    roi = 0
+                item_reduced.append(
+                    [all_200_items[i]['id'], all_200_names[i]['name'], all_200_items[i]['buys']['unit_price'],
+                     all_200_items[i]['sells']['unit_price'], profit, roi])
         items_with_prices += item_reduced
         iterator_all_ids += 200
     return items_with_prices
