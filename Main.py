@@ -6,6 +6,7 @@ url_item_name = 'https://api.guildwars2.com/v2/items?ids='
 """
 function to get all the item ids from the items available on the trading post
 using urllib to request the content of the web api and the using json to interpret the data
+return: all ids from items that are available on the trading post
 """
 
 
@@ -23,6 +24,9 @@ this includes the buy and sell quantity and unit_prices
 using 200 steps since the api can't handle more than 200 id calls at once.
 this results in a reduction of several thousands website calls. Before I called it each on it own which resulted in 
 around 30.000 calls. This was reduced to around 150 calls.
+
+get: all ids that needs to be reviewd
+return: list of lists in which each list contains id, name, sell and buy price, profit from flipping and the roi
 """
 
 
@@ -52,6 +56,12 @@ def get_prices(ids_to_check):
         iterator_all_ids += 200
     return items_with_prices
 
+
+"""
+function which gets all possible ids, then get their information and updates the db
+"""
+
+
 def update_db():
     get_id = get_all_ids()
     items = get_prices(get_id)
@@ -59,6 +69,9 @@ def update_db():
     connect.commit()
 
 
+"""
+main function which enables a connection to the db and currently prints out all items in the dbS
+"""
 if __name__ == '__main__':
     connect = sqlite3.connect('profit_table.db')
     cursor = connect.cursor()
