@@ -32,7 +32,7 @@ return: list of lists in which each list contains id, name, sell and buy price, 
 """
 
 
-def get_prices(ids_to_check,popup,progress_var):
+def get_prices(ids_to_check, popup, progress_var):
     global interrupt
     items_with_prices = []
     iterator_all_ids = 0
@@ -66,9 +66,11 @@ def get_prices(ids_to_check,popup,progress_var):
 helper function, so that i can cancel the data base update
 """
 
+
 def interrupt_update():
     global interrupt
     interrupt = True
+
 
 """
 function which gets all possible ids, then get their information and updates the db, also shows the progress on a 
@@ -80,7 +82,7 @@ def update_db():
     global interrupt
     popup = tk.Toplevel()
     tk.Label(popup, text="Updating data base").grid(row=0, column=0, padx='5', pady='5')
-    tk.Button(popup,text="cancle",command=interrupt_update).grid(row=3,column=0)
+    tk.Button(popup, text="cancle", command=interrupt_update).grid(row=3, column=0)
     progress_var = tk.DoubleVar()
     progress = ttk.Progressbar(popup, orient='horizontal', mode="determinate", maximum=30000, variable=progress_var)
     progress.grid(row=1, column=0, pady='5', padx='5')
@@ -92,7 +94,7 @@ def update_db():
     interrupt = False
 
     get_id = get_all_ids()
-    items = get_prices(get_id,popup,progress_var)
+    items = get_prices(get_id, popup, progress_var)
     progress.stop()
     popup.destroy()
     cursor.executemany('INSERT OR REPLACE INTO items VALUES (?,?,?,?,?,?)', items)
