@@ -3,6 +3,7 @@ from tkinter import ttk
 
 url_item_ids = 'https://api.guildwars2.com//v2/commerce/prices'
 url_item_name = 'https://api.guildwars2.com/v2/items?ids='
+interrupt = False
 
 """
 function to get all the item ids from the items available on the trading post
@@ -31,18 +32,11 @@ return: list of lists in which each list contains id, name, sell and buy price, 
 """
 
 
-def get_prices(ids_to_check):
-    popup = tk.Toplevel()
-    tk.Label(popup, text="Updating data base").grid(row=0, column=0, padx='5', pady='5')
-    progress_var = tk.DoubleVar()
-    progress = ttk.Progressbar(popup, orient='horizontal', mode="determinate", maximum=30000, variable=progress_var)
-    progress.grid(row=1, column=0, pady='5', padx='5')
-    popup.group(window)
-    popup.pack_slaves()
+def get_prices(ids_to_check,popup,progress_var):
+    global interrupt
     items_with_prices = []
     iterator_all_ids = 0
-    progress.start()
-    while iterator_all_ids < len(ids_to_check):
+    while iterator_all_ids < len(ids_to_check) and not interrupt:
         popup.update()
         id = ",".join([str(elem) for elem in ids_to_check[iterator_all_ids:iterator_all_ids + 200]])
         response_prices = urllib.request.urlopen(url_item_ids + "?ids=" + id)
@@ -65,18 +59,42 @@ def get_prices(ids_to_check):
         items_with_prices += item_reduced
         iterator_all_ids += 200
         progress_var.set(iterator_all_ids)
-    progress.stop()
     return items_with_prices
 
 
 """
-function which gets all possible ids, then get their information and updates the db
+helper function, so that i can cancel the data base update
+"""
+
+def interrupt_update():
+    global interrupt
+    interrupt = True
+
+"""
+function which gets all possible ids, then get their information and updates the db, also shows the progress on a 
+popup window
 """
 
 
 def update_db():
+    global interrupt
+    popup = tk.Toplevel()
+    tk.Label(popup, text="Updating data base").grid(row=0, column=0, padx='5', pady='5')
+    tk.Button(popup,text="cancle",command=interrupt_update).grid(row=3,column=0)
+    progress_var = tk.DoubleVar()
+    progress = ttk.Progressbar(popup, orient='horizontal', mode="determinate", maximum=30000, variable=progress_var)
+    progress.grid(row=1, column=0, pady='5', padx='5')
+    popup.group(window)
+    popup.pack_slaves()
+    progress.start()
+
+    popup.protocol("WM_DELETE_WINDOW", interrupt_update)
+    interrupt = False
+
     get_id = get_all_ids()
-    items = get_prices(get_id)
+    items = get_prices(get_id,popup,progress_var)
+    progress.stop()
+    popup.destroy()
     cursor.executemany('INSERT OR REPLACE INTO items VALUES (?,?,?,?,?,?)', items)
     connect.commit()
 
