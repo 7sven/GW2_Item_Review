@@ -101,8 +101,56 @@ def update_db():
     connect.commit()
 
 
-def get_search():
+"""
+helper function which combines the strings to make them search able in the database
+"""
+
+
+def combine_number(gold, silver, copper):
+    if not gold:
+        gold = "0"
+    if not silver:
+        silver = "00"
+    if not copper:
+        copper = "00"
+    if len(silver) == 1:
+        silver = "0" + silver
+    if len(copper) == 1:
+        copper = "0" + copper
+    return gold + silver + copper
     pass
+
+
+"""
+TODO: implement sorting variant, implement queries for db search, give values in a better manner to textbox
+"""
+
+
+def get_search():
+    results.configure(state='normal')
+    results.delete('1.0', 'end')
+    results.configure(state='disabled')
+    min_gold = minimum_gold_price.get()
+    min_silver = minimum_silver_price.get()
+    min_copper = minimum_copper_price.get()
+    max_gold = maximum_gold_price.get()
+    max_silver = maximum_silver_price.get()
+    max_copper = maximum_copper_price.get()
+    if len(min_copper) > 2 or len(min_silver) > 2 or len(max_silver) > 2 or len(max_copper) > 2:
+        results.configure(state='normal')
+        results.insert('end', "A given value is to long")
+        results.configure(state='disabled')
+        return
+    comb_min = combine_number(min_gold, min_silver, min_copper)
+    comb_max = combine_number(max_gold, max_silver, max_copper)
+    try:
+        comb_min = int(comb_min)
+        comb_max = int(comb_max)
+    except TypeError:
+        results.configure(state='normal')
+        results.insert('end', "A given value is not a number")
+        results.configure(state='disabled')
+        return
 
 
 """
@@ -140,7 +188,7 @@ if __name__ == '__main__':
         "sort most expansive to cheapest",
         "sort by highest profit"
     ])
-    results = ttk.Treeview()
+    results = tk.Text(state='disabled')
 
     min_label.grid(column=0, row=2, padx='5', pady='5', sticky='w')
     minimum_gold_price.grid(column=1, row=2, padx='5', pady='5', sticky='w')
