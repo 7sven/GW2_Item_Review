@@ -135,10 +135,10 @@ if __name__ == '__main__':
     update_button = tk.Button(text="update data base", width=20, command=update_db)
     get_results = tk.Button(text='search', width=5, command=get_search)
     sort_after = ttk.Combobox(window, width=50, values=[
-        "sort after highest return of investment",
+        "sort by return of investment",
         "sort cheapest to most expensive",
         "sort most expansive to cheapest",
-        "sort after highest profit"
+        "sort by highest profit"
     ])
     results = ttk.Treeview()
 
