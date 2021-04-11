@@ -134,16 +134,17 @@ def query(sorting: str, comb_min: int, comb_max: int) -> str:
 
     res = cursor.execute(
         """SELECT * FROM items WHERE buy >= {} AND buy <= {} AND profit > 0 ORDER BY {}""".format(comb_min,
-                                                                                                             comb_max,
-                                                                                                             sort[
-                                                                                                                 sorting]))
+                                                                                                  comb_max,
+                                                                                                  sort[
+                                                                                                      sorting]))
     text = ""
     for i in res:
-        buy = "{}g {}s {}s".format(i[2]//10000,(i[2]%10000)//100,(i[2]%1000)%100)
-        sell = "{}g {}s {}s".format(i[3]//10000,(i[3]%10000)//100,(i[3]%1000)%100)
-        profit = "{}g {}s {}s".format(i[4]//10000,(i[4]%10000)//100,(i[4]%1000)%100)
+        buy = "{}g {}s {}s".format(i[2] // 10000, (i[2] % 10000) // 100, (i[2] % 1000) % 100)
+        sell = "{}g {}s {}s".format(i[3] // 10000, (i[3] % 10000) // 100, (i[3] % 1000) % 100)
+        profit = "{}g {}s {}s".format(i[4] // 10000, (i[4] % 10000) // 100, (i[4] % 1000) % 100)
 
-        text += "{} | buy price = {} | sell price = {} | profit = {} | roi = {}%\n\n".format(i[1], buy, sell, profit, i[5])
+        text += "{} | buy price = {} | sell price = {} | profit = {} | roi = {}%\n\n".format(i[1], buy, sell, profit,
+                                                                                             i[5])
     return text
 
 
@@ -228,7 +229,7 @@ if __name__ == '__main__':
     results = tk.Text(state='disabled', font=("Arial", 8))
     scroll = ttk.Scrollbar(command=results.yview)
     results.configure(state='normal')
-    results['yscrollcommand']= scroll.set
+    results['yscrollcommand'] = scroll.set
 
     min_label.grid(column=0, row=2, padx='5', pady='5', sticky='w')
     minimum_gold_price.grid(column=1, row=2, padx='5', pady='5', sticky='w')
@@ -248,8 +249,8 @@ if __name__ == '__main__':
     sort_by.grid(column=0, columnspan=8, row=3)
     update_button.grid(column=0, row=1, padx='5', pady='5', sticky='w')
     results.grid(column=0, row=4, columnspan=300, padx='5', pady='5', sticky='NESW')
-    scroll.grid(column=9,row=4, rowspan=3, padx='5', pady='5', sticky='nsew')
-    window.grid_columnconfigure(0,weight=1)
+    scroll.grid(column=9, row=4, rowspan=3, padx='5', pady='5', sticky='nsew')
+    window.grid_columnconfigure(0, weight=1)
     window.mainloop()
 
     connect.close()
