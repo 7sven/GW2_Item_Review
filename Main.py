@@ -185,7 +185,7 @@ def get_search():
 
 
 """
-main function which enables a connection to the db and currently prints out all items in the dbS
+main function which enables a connection to the db and creates a window so the user can do the things
 """
 if __name__ == '__main__':
     connect = sqlite3.connect('profit_table.db')
