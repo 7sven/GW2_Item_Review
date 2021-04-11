@@ -81,7 +81,7 @@ popup window
 def update_db():
     global interrupt
     popup = tk.Toplevel(takefocus=True)
-    popup.geometry("100x100+%d+%d"%(window.winfo_x()+100,window.winfo_y()+100))
+    popup.geometry("100x100+%d+%d" % (window.winfo_x() + 100, window.winfo_y() + 100))
     tk.Label(popup, text="Updating data base").grid(row=0, column=0, padx='5', pady='5')
     tk.Button(popup, text="cancle", command=interrupt_update).grid(row=3, column=0)
     progress_var = tk.DoubleVar()
@@ -121,6 +121,25 @@ def combine_number(gold, silver, copper):
     return gold + silver + copper
     pass
 
+"""
+helper function to make the db query and make the result into a text 
+return: text of 20 items corresponding to the query
+"""
+
+def query(sorting: str, comb_min: int, comb_max: int) -> str:
+    sort = {"sort by return of investment": "roi DESC", "sort cheapest to most expensive": "buy",
+            "sort most expansive to cheapest": "buy DESC", "sort by highest profit": "profit DESC"}
+
+    res = cursor.execute(
+        """SELECT * FROM items WHERE buy >= {} AND buy <= {} AND profit > 0 ORDER BY {} LIMIT 0,20""".format(comb_min,
+                                                                                                             comb_max,
+                                                                                                             sort[
+                                                                                                                 sorting]))
+    text = ""
+    for i in res:
+        text += "{} buy price = {} sell price = {} profit = {} roi = {}\n".format(i[1],i[2],i[3],i[4],i[5])
+    return text
+
 
 """
 TODO: implement sorting variant, implement queries for db search, give values in a better manner to textbox
@@ -128,6 +147,7 @@ TODO: implement sorting variant, implement queries for db search, give values in
 
 
 def get_search():
+    sorting = sort_by.get()
     results.configure(state='normal')
     results.delete('1.0', 'end')
     results.configure(state='disabled')
@@ -137,9 +157,9 @@ def get_search():
     max_gold = maximum_gold_price.get()
     max_silver = maximum_silver_price.get()
     max_copper = maximum_copper_price.get()
-    if len(min_copper) > 2 or len(min_silver) > 2 or len(max_silver) > 2 or len(max_copper) > 2:
+    if len(min_copper) > 2 or len(min_silver) > 2 or len(max_silver) > 2 or len(max_copper) > 2 or not sorting:
         results.configure(state='normal')
-        results.insert('end', "A given value is to long")
+        results.insert('end', "A given value is to long or you didn't chose the sorting method")
         results.configure(state='disabled')
         return
     comb_min = combine_number(min_gold, min_silver, min_copper)
@@ -152,7 +172,10 @@ def get_search():
         results.insert('end', "A given value is not a number")
         results.configure(state='disabled')
         return
-
+    text_to_print = query(sorting, comb_min, comb_max)
+    results.configure(state='normal')
+    results.insert('end', text_to_print)
+    results.configure(state='disabled')
 
 """
 main function which enables a connection to the db and currently prints out all items in the dbS
@@ -189,21 +212,21 @@ if __name__ == '__main__':
     maximum_copper_price = ttk.Entry(width=5)
     update_button = tk.Button(text="update data base", width=20, command=update_db)
     get_results = tk.Button(text='search', width=5, command=get_search)
-    sort_after = ttk.Combobox(window, width=50, values=[
+    sort_by = ttk.Combobox(window, width=50, values=[
         "sort by return of investment",
         "sort cheapest to most expensive",
         "sort most expansive to cheapest",
         "sort by highest profit"
     ])
-    results = tk.Text(state='disabled')
+    results = tk.Text(state='disabled', font=("Arial",7))
 
     min_label.grid(column=0, row=2, padx='5', pady='5', sticky='w')
     minimum_gold_price.grid(column=1, row=2, padx='5', pady='5', sticky='w')
     minimum_silver_price.grid(column=2, row=2, padx='5', pady='5', sticky='w')
     minimum_copper_price.grid(column=3, row=2, padx='5', pady='5', sticky='w')
-    gold1.grid(column=1, row=1,padx='5', pady='5', sticky='w')
-    silver1.grid(column=2, row=1,padx='5', pady='5', sticky='w')
-    copper1.grid(column=3, row=1,padx='5', pady='5', sticky='w')
+    gold1.grid(column=1, row=1, padx='5', pady='5', sticky='w')
+    silver1.grid(column=2, row=1, padx='5', pady='5', sticky='w')
+    copper1.grid(column=3, row=1, padx='5', pady='5', sticky='w')
     max_label.grid(column=4, row=2, padx='5', pady='5', sticky='w')
     maximum_gold_price.grid(column=5, row=2, padx='5', pady='5', sticky='w')
     maximum_silver_price.grid(column=6, row=2, padx='5', pady='5', sticky='w')
@@ -212,7 +235,7 @@ if __name__ == '__main__':
     silver2.grid(column=6, row=1, padx='5', pady='5', sticky='w')
     copper2.grid(column=7, row=1, padx='5', pady='5', sticky='w')
     get_results.grid(column=7, row=3)
-    sort_after.grid(column=0, columnspan=8, row=3)
+    sort_by.grid(column=0, columnspan=8, row=3)
     update_button.grid(column=0, row=1, padx='5', pady='5', sticky='w')
     results.grid(column=0, row=4, columnspan=9, padx='5', pady='5', sticky='NESW')
 
