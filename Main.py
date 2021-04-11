@@ -133,7 +133,7 @@ def query(sorting: str, comb_min: int, comb_max: int) -> str:
             "sort most expansive to cheapest": "buy DESC", "sort by highest profit": "profit DESC"}
 
     res = cursor.execute(
-        """SELECT * FROM items WHERE buy >= {} AND buy <= {} AND profit > 0 ORDER BY {} LIMIT 0,20""".format(comb_min,
+        """SELECT * FROM items WHERE buy >= {} AND buy <= {} AND profit > 0 ORDER BY {}""".format(comb_min,
                                                                                                              comb_max,
                                                                                                              sort[
                                                                                                                  sorting]))
@@ -143,12 +143,12 @@ def query(sorting: str, comb_min: int, comb_max: int) -> str:
         sell = "{}g {}s {}s".format(i[3]//10000,(i[3]%10000)//100,(i[3]%1000)%100)
         profit = "{}g {}s {}s".format(i[4]//10000,(i[4]%10000)//100,(i[4]%1000)%100)
 
-        text += "{} buy price = {} sell price = {} profit = {} roi = {}%\n\n".format(i[1], buy, sell, profit, i[5])
+        text += "{} | buy price = {} | sell price = {} | profit = {} | roi = {}%\n\n".format(i[1], buy, sell, profit, i[5])
     return text
 
 
 """
-TODO: implement sorting variant, implement queries for db search, give values in a better manner to textbox
+function which gets all the values from the gui and in the end stows a result into the text field
 """
 
 
@@ -226,6 +226,9 @@ if __name__ == '__main__':
         "sort by highest profit"
     ])
     results = tk.Text(state='disabled', font=("Arial", 8))
+    scroll = ttk.Scrollbar(command=results.yview)
+    results.configure(state='normal')
+    results['yscrollcommand']= scroll.set
 
     min_label.grid(column=0, row=2, padx='5', pady='5', sticky='w')
     minimum_gold_price.grid(column=1, row=2, padx='5', pady='5', sticky='w')
@@ -244,8 +247,9 @@ if __name__ == '__main__':
     get_results.grid(column=7, row=3)
     sort_by.grid(column=0, columnspan=8, row=3)
     update_button.grid(column=0, row=1, padx='5', pady='5', sticky='w')
-    results.grid(column=0, row=4, columnspan=9, padx='5', pady='5', sticky='NESW')
-
+    results.grid(column=0, row=4, columnspan=300, padx='5', pady='5', sticky='NESW')
+    scroll.grid(column=9,row=4, rowspan=3, padx='5', pady='5', sticky='nsew')
+    window.grid_columnconfigure(0,weight=1)
     window.mainloop()
 
     connect.close()
