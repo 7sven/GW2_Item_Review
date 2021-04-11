@@ -121,10 +121,12 @@ def combine_number(gold, silver, copper):
     return gold + silver + copper
     pass
 
+
 """
 helper function to make the db query and make the result into a text 
 return: text of 20 items corresponding to the query
 """
+
 
 def query(sorting: str, comb_min: int, comb_max: int) -> str:
     sort = {"sort by return of investment": "roi DESC", "sort cheapest to most expensive": "buy",
@@ -137,7 +139,11 @@ def query(sorting: str, comb_min: int, comb_max: int) -> str:
                                                                                                                  sorting]))
     text = ""
     for i in res:
-        text += "{} buy price = {} sell price = {} profit = {} roi = {}\n".format(i[1],i[2],i[3],i[4],i[5])
+        buy = "{}g {}s {}s".format(i[2]//10000,(i[2]%10000)//100,(i[2]%1000)%100)
+        sell = "{}g {}s {}s".format(i[3]//10000,(i[3]%10000)//100,(i[3]%1000)%100)
+        profit = "{}g {}s {}s".format(i[4]//10000,(i[4]%10000)//100,(i[4]%1000)%100)
+
+        text += "{} buy price = {} sell price = {} profit = {} roi = {}%\n\n".format(i[1], buy, sell, profit, i[5])
     return text
 
 
@@ -176,6 +182,7 @@ def get_search():
     results.configure(state='normal')
     results.insert('end', text_to_print)
     results.configure(state='disabled')
+
 
 """
 main function which enables a connection to the db and currently prints out all items in the dbS
@@ -218,7 +225,7 @@ if __name__ == '__main__':
         "sort most expansive to cheapest",
         "sort by highest profit"
     ])
-    results = tk.Text(state='disabled', font=("Arial",7))
+    results = tk.Text(state='disabled', font=("Arial", 8))
 
     min_label.grid(column=0, row=2, padx='5', pady='5', sticky='w')
     minimum_gold_price.grid(column=1, row=2, padx='5', pady='5', sticky='w')
