@@ -248,9 +248,10 @@ if __name__ == '__main__':
     get_results.grid(column=7, row=3)
     sort_by.grid(column=0, columnspan=8, row=3)
     update_button.grid(column=0, row=1, padx='5', pady='5', sticky='w')
-    results.grid(column=0, row=4, columnspan=300, padx='5', pady='5', sticky='NESW')
+    results.grid(column=0, row=4, columnspan=9, padx='5', pady='5', sticky='NESW')
     scroll.grid(column=9, row=4, rowspan=3, padx='5', pady='5', sticky='nsew')
     window.grid_columnconfigure(0, weight=1)
+    window.grid_rowconfigure(4,weight=1)
     window.mainloop()
 
     connect.close()
